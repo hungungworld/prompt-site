@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude HR 도구 | HR 프롬프트 플레이북</title>
+<meta name="description" content="Claude에서 HR 업무별로 쓸 플러그인 슬래시 명령과 연결할 서비스를 정리했어요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/common.css">
+<style>
+  .what { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .what div { background: var(--paper); border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 0 var(--line); font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+  .what b { display: block; color: var(--ink); font-size: 15.5px; margin-bottom: 2px; }
+  .tool { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 18px 26px; }
+  .tool h3 { font-size: 19px; }
+  .tool .ex { margin: 6px 0 0; font-size: 15px; color: var(--ink-2); }
+  .tool .ex q { color: var(--ink); }
+  .tool .alt { margin: 6px 0 0; font-size: 14px; color: var(--ink-3); }
+  .side { border-left: 1px solid var(--line-2); padding-left: 22px; display: grid; gap: 8px; align-content: start; }
+  .side .plugin { font-size: 13.5px; color: var(--ink-3); }
+  .side .plugin b { color: var(--ink); font-weight: 600; }
+  .cmd {
+    cursor: pointer; text-align: left; border: 1px solid var(--line); background: #FAFBFD; border-radius: 8px;
+    padding: 6px 10px; font: 500 13.5px/1.4 ui-monospace, "Cascadia Code", Consolas, monospace; color: var(--ink); overflow-wrap: anywhere;
+  }
+  .cmd:hover { border-color: var(--teal); }
+  .cmd.done { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .pill { display: inline-block; font-size: 12.5px; font-weight: 600; border-radius: 999px; padding: 2px 10px; width: fit-content; }
+  .pill.ready { background: var(--teal-soft); color: var(--teal-dark); }
+  .pill.link { background: var(--marker-soft); color: #7A5B00; }
+  .need { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  .copy-line { justify-self: start; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--paper); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 0 var(--line); }
+  th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--line-2); }
+  th { background: var(--fog); font-size: 13.5px; color: var(--ink-2); font-weight: 600; }
+  td code, .howto code { font: 500 13px/1.4 ui-monospace, Consolas, monospace; background: var(--fog); padding: 1px 6px; border-radius: 4px; }
+  .howto ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+  .rules { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+  @media (max-width: 760px) {
+    .what { grid-template-columns: minmax(0, 1fr); }
+    .tool { grid-template-columns: minmax(0, 1fr); }
+    .side { border-left: 0; padding-left: 0; border-top: 1px solid var(--line-2); padding-top: 14px; }
+    .table-wrap { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="gnb">
+  <div class="wrap gnb-in">
+    <a class="brand" href="index.html"><i>HR</i>프롬프트 플레이북</a>
+    <nav class="gnb-tabs" aria-label="주 메뉴">
+      <a href="prompts.html"><b>업무별 프롬프트</b><small>빈칸만 채워 바로 쓰기</small></a>
+      <a href="generator.html"><b>맞춤 프롬프트 만들기</b><small>목록에 없는 업무는 3칸으로</small></a>
+      <a href="techniques.html"><b>답 고치는 기법</b><small>AI 답이 아쉬울 때</small></a>
+      <a href="tools.html" aria-current="page"><b>Claude HR 도구</b><small>슬래시 명령·플러그인</small></a>
+    </nav>
+  </div>
+</header>
+<div class="crumbbar">
+  <nav class="wrap crumbs" aria-label="현재 위치">
+    <ol>
+      <li><a href="index.html">홈</a></li>
+      <li><a href="tools.html">Claude HR 도구</a></li>
+      <li data-crumb="cat" hidden></li>
+      <li data-crumb="item" hidden></li>
+    </ol>
+  </nav>
+</div>
+
+<div class="wrap layout">
+  <nav class="lnb" aria-label="업무 단계" data-title="업무 단계별 도구"></nav>
+
+  <main class="content" data-spy-root>
+    <header class="page-head">
+      <p class="eyebrow">Claude HR 도구</p>
+      <h1>Claude에서 HR 업무를<br>명령어 하나로 시작하기</h1>
+      <p>Claude(데스크톱 앱·Claude Code)에 설치한 플러그인을 업무별로 정리했어요. 프롬프트를 직접 쓰지 않아도, 슬래시 명령 뒤에 요청 한 줄만 적으면 돼요.</p>
+      <div class="what">
+        <div><b>플러그인</b>HR·문서 작업용 기능 묶음. 설치하면 슬래시 명령이 생겨요.</div>
+        <div><b>슬래시 명령</b><code>/human-resources:onboarding</code>처럼 입력창에 쳐서 부르는 명령.</div>
+        <div><b>커넥터</b>Notion·Slack 같은 사내 서비스의 실제 자료를 Claude가 읽게 하는 연결.</div>
+      </div>
+    </header>
+
+    <div id="stages"></div>
+
+    <section class="cat-sec" id="ref" data-spy-cat data-title="한눈에 보기">
+      <header class="cat-head"><span class="no">REF</span><h2>한눈에 보기</h2><p>플러그인·커넥터 목록과 쓰는 법</p></header>
+      <div class="card">
+        <div class="tabs" role="tablist" aria-label="참고 자료">
+          <button type="button" role="tab" id="r-t1" aria-controls="r-p1" aria-selected="true">플러그인</button>
+          <button type="button" role="tab" id="r-t2" aria-controls="r-p2" aria-selected="false" tabindex="-1">커넥터</button>
+          <button type="button" role="tab" id="r-t3" aria-controls="r-p3" aria-selected="false" tabindex="-1">슬래시 명령 쓰는 법</button>
+          <button type="button" role="tab" id="r-t4" aria-controls="r-p4" aria-selected="false" tabindex="-1">겹칠 때 고르는 기준</button>
+        </div>
+        <div role="tabpanel" id="r-p1" aria-labelledby="r-t1"><div class="table-wrap"><table id="plugins"></table></div></div>
+        <div role="tabpanel" id="r-p2" aria-labelledby="r-t2" hidden><div class="table-wrap"><table id="connectors"></table></div></div>
+        <div role="tabpanel" id="r-p3" aria-labelledby="r-t3" hidden>
+          <div class="howto"><ol>
+            <li>Claude 입력창에 <code>/</code>를 입력하면 쓸 수 있는 명령 목록이 나와요.</li>
+            <li>명령 뒤에 한 칸 띄우고 요청을 적어요. 예: <code>/human-resources:onboarding 다음 주 입사하는 디자이너 온보딩 계획</code></li>
+            <li>슬래시를 몰라도 "온보딩 계획 짜 줘"처럼 말하면 Claude가 맞는 기능을 골라요. 슬래시로 부르면 원하는 기능이 확실하게 실행돼요.</li>
+            <li>'연결 필요' 표시가 있는 커넥터는 처음 한 번 계정을 연결해야 써요.</li>
+          </ol></div>
+        </div>
+        <div role="tabpanel" id="r-p4" aria-labelledby="r-t4" hidden>
+          <ul class="rules">
+            <li><b>글 한 편:</b> 공고·공지·메일은 <a href="prompts.html">업무별 프롬프트</a> 틀이 더 세밀해요. 명령은 빠르게 초안이 필요할 때.</li>
+            <li><b>파일로 받기:</b> 워드·엑셀·슬라이드 파일이 필요하면 문서 스킬(docx·xlsx·pptx)을 함께 불러요.</li>
+            <li><b>사내 자료 기반:</b> 규정·채용 보드가 Notion·Confluence에 있으면 커넥터를 연결해야 실제 내용을 읽어요.</li>
+            <li><b>개인정보:</b> 지원자·직원 실명이 담긴 파일은 올리기 전에 가리거나, 회사 보안 정책을 먼저 확인해요.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer><div class="wrap">기준일 2026-11-22. 현재 Claude에 설치된 플러그인 목록을 바탕으로 정리했어요. 플러그인·명령 이름은 설치 상태와 버전에 따라 다를 수 있어요.</div></footer>
+
+<script src="assets/shell.js"></script>
+<script>
+const { esc } = Shell;
+
+/* 1) 플러그인 — prefix: 슬래시 명령 앞부분 */
+const PLUGINS = {
+  hr:   { name: "Human Resources", prefix: "human-resources", use: "채용 파이프라인, 면접 준비, 오퍼 레터, 온보딩, 성과 평가, 보상 분석, 조직 설계, 인사 리포트, 규정 찾기" },
+  cv:   { name: "CV Builder", prefix: "cv-builder", use: "이력서 작성·검토, 성과 문장 다듬기, 직무에 맞게 고치기" },
+  docs: { name: "문서 스킬", prefix: "anthropic-skills", use: "워드(docx)·엑셀(xlsx)·슬라이드(pptx)·PDF 파일 만들기와 읽기" },
+  fed:  { name: "frontend-design", prefix: "frontend-design", use: "HR 대시보드·교육용 웹페이지를 디자인까지 바로 만들기" },
+  core: { name: "Claude Code 기본 명령", prefix: "", use: "/init (CLAUDE.md 만들기), /code-review 등 설치 없이 쓰는 명령" }
+};
+
+/* 2) 업무 단계별 도구 */
+const STAGES = [
+  { id: "s-recruit", title: "채용", rows: [
+    { sit: "채용 파이프라인 현황 정리", p: "hr", cmds: ["recruiting-pipeline"], ex: "백엔드 포지션 지원자를 전형 단계별로 정리하고 병목을 알려줘", conn: "Notion·Atlassian을 연결하면 실제 채용 보드를 읽어요" },
+    { sit: "면접 질문과 평가표 준비", p: "hr", cmds: ["interview-prep"], ex: "PM 최종 면접 질문 8개와 역량별 평가표 만들어줘", alt: "더 세밀하게: 업무별 프롬프트 > 구조화 면접 질문" },
+    { sit: "오퍼 레터 초안", p: "hr", cmds: ["draft-offer"], ex: "합격자 오퍼 레터 초안 써줘. 입사일 12월 2일, 연봉은 [금액]으로 비워 둬" },
+    { sit: "지원자 이력서를 직무 기준으로 검토", p: "cv", cmds: ["review-resume"], ex: "이 이력서를 아래 채용공고 기준으로 강점·약점·확인할 질문으로 정리해줘", alt: "이름·연락처는 가리고 올려요" } ] },
+  { id: "s-onboard", title: "온보딩", rows: [
+    { sit: "입사 체크리스트와 첫 주 계획", p: "hr", cmds: ["onboarding"], ex: "다음 주 월요일 입사하는 디자이너 온보딩 체크리스트와 첫 주 일정, 30·60·90일 목표" } ] },
+  { id: "s-perform", title: "성과·보상", rows: [
+    { sit: "성과 평가 작성", p: "hr", cmds: ["performance-review"], ex: "A님 상반기 평가 초안 써줘. 아래 성과 메모 참고" },
+    { sit: "보상 수준 분석", p: "hr", cmds: ["comp-analysis"], ex: "데이터 분석가 직군 연봉 밴드가 적절한지 검토해줘", conn: "시장 연봉 숫자는 출처가 있는 조사 자료로 다시 확인해요" } ] },
+  { id: "s-org", title: "조직·규정", rows: [
+    { sit: "조직 설계와 인력 계획", p: "hr", cmds: ["org-planning"], ex: "내년 개발본부 조직 개편안 2가지와 인력 충원 계획" },
+    { sit: "사내 규정 찾기와 답변", p: "hr", cmds: ["policy-lookup"], ex: "육아휴직 중에도 복지포인트가 지급되는지 규정에서 찾아줘", conn: "규정이 Notion·Confluence에 있으면 연결해야 실제 문서를 찾아요" } ] },
+  { id: "s-data", title: "인사 데이터·보고", rows: [
+    { sit: "인사 지표 리포트", p: "hr", cmds: ["people-report"], ex: "3분기 입사·퇴사·이직률 리포트 만들어줘" },
+    { sit: "엑셀로 집계·정리", p: "docs", cmds: ["xlsx"], ex: "이 인사 명부에서 부서별 평균 근속연수와 퇴사율 시트를 만들어줘", alt: "개인정보는 지우고 열 구조만 남겨서" },
+    { sit: "HR 대시보드 화면 만들기", p: "fed", cmds: ["frontend-design"], ex: "온보딩 진행률 대시보드를 HTML 한 파일로. 상단 지표 4개, 부서별 표, 가짜 데이터로" } ] },
+  { id: "s-docs", title: "문서·교육 자료", rows: [
+    { sit: "규정·안내문 워드 파일", p: "docs", cmds: ["docx"], ex: "이 내용으로 복리후생 안내 워드 파일 만들어줘" },
+    { sit: "교육용 슬라이드", p: "docs", cmds: ["pptx"], ex: "신입사원 입문 교육 '회사 소개' 슬라이드 10장" },
+    { sit: "PDF 자료 요약", p: "docs", cmds: ["pdf"], ex: "이 노무 가이드 PDF에서 연차 관련 내용만 정리해줘" },
+    { sit: "프로젝트 규칙 파일 만들기", p: "core", cmds: ["init"], ex: "", alt: "HR 웹페이지를 Claude Code로 만들 때, 지킬 규칙(예: 한국어 페이지는 word-break: keep-all)을 CLAUDE.md에 적어 둬요" } ] }
+];
+
+/* 3) 커넥터 */
+const CONNECTORS = [
+  { name: "Notion", on: false, role: "채용 보드, 온보딩 문서, 사내 위키 읽기", note: "HR 플러그인과 함께 쓰려면 연결 필요" },
+  { name: "Slack", on: false, role: "사내 메시지·채널 내용 참고", note: "공지 초안을 채널 분위기에 맞출 때" },
+  { name: "Atlassian (Jira·Confluence)", on: false, role: "규정 문서, 채용 요청 티켓", note: "규정이 Confluence에 있을 때" },
+  { name: "Google Drive", on: true, role: "드라이브 문서·시트 찾아 읽기", note: "개인정보가 담긴 파일은 공유 범위를 먼저 확인" },
+  { name: "Vercel", on: true, role: "만든 HR 대시보드·게임을 인터넷에 배포", note: "GitHub에 올리면 자동 배포되게 연결" }
+];
+
+const slash = (p, c) => PLUGINS[p].prefix ? `/${PLUGINS[p].prefix}:${c}` : `/${c}`;
+
+const $id = id => document.getElementById(id);
+let n = 0;
+$id("stages").innerHTML = STAGES.map((s, si) => `
+  <section class="cat-sec" id="${s.id}" data-spy-cat data-title="${esc(s.title)}">
+    <header class="cat-head"><span class="no">${String(si + 1).padStart(2, "0")}</span><h2>${esc(s.title)}</h2><p>도구 ${s.rows.length}개</p></header>
+    ${s.rows.map(r => {
+      const id = `${s.id}-${++n}`;
+      const first = slash(r.p, r.cmds[0]);
+      const line = r.ex ? `${first} ${r.ex}` : first;
+      return `<article class="card tool" id="${id}" data-spy-item data-title="${esc(r.sit)}">
+        <div>
+          <h3>${esc(r.sit)}</h3>
+          ${r.ex ? `<p class="ex">예시 요청 <q>${esc(r.ex)}</q></p>` : ""}
+          ${r.alt ? `<p class="alt">${esc(r.alt)}</p>` : ""}
+          ${r.ex ? `<p style="margin:12px 0 0"><button class="ghost js-copy copy-line" type="button" data-copy-text="${esc(line)}">명령과 예시 요청 복사</button></p>` : ""}
+        </div>
+        <div class="side">
+          <span class="plugin">플러그인 <b>${esc(PLUGINS[r.p].name)}</b></span>
+          ${r.cmds.map(c => `<button class="cmd js-copy" type="button" data-copy-text="${esc(slash(r.p, c))}" title="누르면 복사돼요">${esc(slash(r.p, c))}</button>`).join("")}
+          <span class="pill ready">설치됨 · 바로 사용</span>
+          ${r.conn ? `<span class="need">${esc(r.conn)}</span>` : ""}
+        </div>
+      </article>`;
+    }).join("")}
+  </section>`).join("");
+
+$id("plugins").innerHTML = `<tr><th>플러그인</th><th>명령 앞부분</th><th>맡는 일</th></tr>` +
+  Object.values(PLUGINS).map(p => `<tr><td><b>${esc(p.name)}</b></td><td><code>/${p.prefix ? p.prefix + ":" : ""}</code></td><td>${esc(p.use)}</td></tr>`).join("");
+$id("connectors").innerHTML = `<tr><th>커넥터</th><th>상태</th><th>하는 일</th><th>메모</th></tr>` +
+  CONNECTORS.map(c => `<tr><td><b>${esc(c.name)}</b></td><td>${c.on ? '<span class="pill ready">연결됨</span>' : '<span class="pill link">연결 필요</span>'}</td><td>${esc(c.role)}</td><td>${esc(c.note)}</td></tr>`).join("");
+
+Shell.initSpy();
+Shell.jumpToHash();
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>업무별 프롬프트 | HR 프롬프트 플레이북</title>
+<meta name="description" content="채용·온보딩·교육·성과·보상·조직문화·노무·인사 데이터 업무별로 빈칸만 채우면 되는 AI 프롬프트 틀">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/common.css">
+<style>
+  .task-foot { margin: 14px 0 0; font-size: 14.5px; color: var(--ink-2); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 14px; color: var(--ink-2); }
+  .more { margin-top: 8px; padding: 22px 26px; border: 2px dashed var(--line); border-radius: 14px; color: var(--ink-2); }
+  .more a { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="gnb">
+  <div class="wrap gnb-in">
+    <a class="brand" href="index.html"><i>HR</i>프롬프트 플레이북</a>
+    <nav class="gnb-tabs" aria-label="주 메뉴">
+      <a href="prompts.html" aria-current="page"><b>업무별 프롬프트</b><small>빈칸만 채워 바로 쓰기</small></a>
+      <a href="generator.html"><b>맞춤 프롬프트 만들기</b><small>목록에 없는 업무는 3칸으로</small></a>
+      <a href="techniques.html"><b>답 고치는 기법</b><small>AI 답이 아쉬울 때</small></a>
+      <a href="tools.html"><b>Claude HR 도구</b><small>슬래시 명령·플러그인</small></a>
+    </nav>
+  </div>
+</header>
+<div class="crumbbar">
+  <nav class="wrap crumbs" aria-label="현재 위치">
+    <ol>
+      <li><a href="index.html">홈</a></li>
+      <li><a href="prompts.html">업무별 프롬프트</a></li>
+      <li data-crumb="cat" hidden></li>
+      <li data-crumb="item" hidden></li>
+    </ol>
+  </nav>
+</div>
+
+<div class="wrap layout">
+  <nav class="lnb" aria-label="HR 업무 영역" data-title="HR 업무 영역"></nav>
+
+  <main class="content" data-spy-root>
+    <header class="page-head">
+      <p class="eyebrow">업무별 프롬프트</p>
+      <h1>HR 업무를 고르고<br>빈칸만 채우세요</h1>
+      <p>업무마다 바로 쓰는 프롬프트 틀이 있어요. 칸을 채우면 아래 프롬프트에 바로 들어가고, 복사해서 Claude·ChatGPT·Gemini에 붙여 넣으면 돼요.</p>
+      <div class="legend">
+        <span><mark class="blank">( 칸 이름 )</mark> 아직 안 채운 칸</span>
+        <span><mark class="fill">채운 값</mark> 내가 채운 칸</span>
+      </div>
+      <div class="notice"><b>개인정보 주의</b><span>실명·주민번호·연봉 같은 실제 개인정보는 넣지 말고 'A님', '○○팀'처럼 바꿔서 쓰세요. AI 답은 초안이에요. 법·제도·숫자는 꼭 공식 자료로 확인하세요.</span></div>
+    </header>
+
+    <div id="areas"></div>
+
+    <p class="more">찾는 업무가 없나요? <a href="generator.html">맞춤 프롬프트 만들기</a>에서 작업·결과물·피할 것 세 칸만 쓰면 새 프롬프트를 만들어 드려요.</p>
+  </main>
+</div>
+
+<footer><div class="wrap">HR 실무에서 자주 하는 일을 프롬프트 틀로 정리했어요. AI의 답은 초안이니, 근로기준법 등 법·제도는 국가법령정보센터와 고용노동부 자료로 확인하세요.</div></footer>
+
+<script src="assets/shell.js"></script>
+<script src="assets/data-techniques.js"></script>
+<script src="assets/data-prompts.js"></script>
+<script>
+const { esc } = Shell;
+const TECH = Object.fromEntries(TECHNIQUES.map(t => [t.id, t.name]));
+const SLOT = /\[\[(.+?)::([\s\S]+?)\]\]/g;
+const TASKS = {};   // 카드 id → 업무 정보
+
+// 프롬프트 속 칸 목록 (같은 이름은 한 번만)
+function slotsOf(p) {
+  const m = new Map();
+  for (const [, name, ex] of p.matchAll(SLOT)) if (!m.has(name)) m.set(name, ex);
+  return m;
+}
+// 칸을 표시해서 프롬프트 그리기
+function renderPrompt(p, mark) {
+  let out = "", last = 0;
+  for (const m of p.matchAll(SLOT)) {
+    out += esc(p.slice(last, m.index)) + mark(m[1], m[2]);
+    last = m.index + m[0].length;
+  }
+  return out + esc(p.slice(last));
+}
+const exampleMark = (n, ex) => `<mark class="fill">${esc(ex)}</mark>`;
+
+function card(area, t) {
+  const uid = `${area.id}-${t.id}`;
+  TASKS[uid] = t;
+  const slots = [...slotsOf(t.prompt)];
+  const fields = slots.map(([name, ex], i) => {
+    const long = ex.length > 46 || ex.includes("\n");
+    const id = `${uid}-f${i}`;
+    const ph = esc(ex.split("\n")[0]) + (ex.includes("\n") ? " …" : "");
+    return `<div class="field${long ? " wide" : ""}"><label for="${id}">${esc(name)}</label>` +
+      (long ? `<textarea id="${id}" data-slot="${esc(name)}" placeholder="예: ${ph}"></textarea>`
+            : `<input id="${id}" type="text" data-slot="${esc(name)}" placeholder="예: ${ph}" autocomplete="off">`) + `</div>`;
+  }).join("");
+  const techs = t.tech.map(id => `<a href="techniques.html#t-${id}">${TECH[id]}</a>`).join("");
+  return `
+  <article class="card task" id="${uid}" data-spy-item data-title="${esc(t.title)}">
+    <h3>${esc(t.title)}</h3>
+    <p class="when">${esc(t.when)}</p>
+    <p class="techs"><span>쓰인 기법</span>${techs}</p>
+
+    <div class="tabs" role="tablist" aria-label="${esc(t.title)} 보기 방식">
+      <button type="button" role="tab" id="${uid}-t1" aria-controls="${uid}-p1" aria-selected="true">내 값으로 채우기</button>
+      <button type="button" role="tab" id="${uid}-t2" aria-controls="${uid}-p2" aria-selected="false" tabindex="-1">예시로 채운 모습</button>
+      <button type="button" role="tab" id="${uid}-t3" aria-controls="${uid}-p3" aria-selected="false" tabindex="-1">결과 확인 포인트</button>
+    </div>
+
+    <div role="tabpanel" id="${uid}-p1" aria-labelledby="${uid}-t1">
+      <div class="fields" data-fields="${uid}">
+        ${fields}
+        <div class="field-actions">
+          <button class="ghost" type="button" data-act="example">예시 값 넣기</button>
+          <button class="ghost" type="button" data-act="clear">모두 비우기</button>
+        </div>
+      </div>
+      <div class="tpl"><div class="tpl-bar"><span>칸을 채우면 여기에 바로 들어가요</span><button class="copy js-copy" type="button">프롬프트 복사</button></div><pre data-out="${uid}"></pre></div>
+    </div>
+
+    <div role="tabpanel" id="${uid}-p2" aria-labelledby="${uid}-t2" hidden>
+      <div class="tpl"><div class="tpl-bar"><span>노란 부분이 예시로 채운 값이에요</span><button class="copy js-copy" type="button">예시 그대로 복사</button></div><pre>${renderPrompt(t.prompt, exampleMark)}</pre></div>
+    </div>
+
+    <div role="tabpanel" id="${uid}-p3" aria-labelledby="${uid}-t3" hidden>
+      <ul class="checks">${t.checks.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+      <p class="task-foot">AI가 쓴 답을 그대로 내보내기 전에 위 항목을 사람이 확인하세요.</p>
+    </div>
+  </article>`;
+}
+
+// 내 값으로 프롬프트 다시 그리기
+function update(uid) {
+  const vals = {};
+  document.querySelectorAll(`[data-fields="${uid}"] [data-slot]`).forEach(f => { vals[f.dataset.slot] = f.value.trim(); });
+  document.querySelector(`[data-out="${uid}"]`).innerHTML = renderPrompt(TASKS[uid].prompt,
+    n => vals[n] ? `<mark class="fill">${esc(vals[n])}</mark>` : `<mark class="blank">( ${esc(n)} )</mark>`);
+}
+
+document.getElementById("areas").innerHTML = AREAS.map((a, i) => `
+  <section class="cat-sec" id="${a.id}" data-spy-cat data-title="${esc(a.title)}">
+    <header class="cat-head"><span class="no">${String(i + 1).padStart(2, "0")}</span><h2>${esc(a.title)}</h2><p>${esc(a.desc)} · 프롬프트 ${a.tasks.length}개</p></header>
+    ${a.tasks.map(t => card(a, t)).join("")}
+  </section>`).join("");
+
+Object.keys(TASKS).forEach(update);
+
+const areasEl = document.getElementById("areas");
+areasEl.addEventListener("input", e => {
+  const box = e.target.closest("[data-fields]");
+  if (box) update(box.dataset.fields);
+});
+areasEl.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const box = b.closest("[data-fields]");
+  const ex = slotsOf(TASKS[box.dataset.fields].prompt);
+  box.querySelectorAll("[data-slot]").forEach(f => { f.value = b.dataset.act === "example" ? ex.get(f.dataset.slot) : ""; });
+  update(box.dataset.fields);
+});
+
+Shell.initSpy();
+Shell.jumpToHash();
+</script>
+</body>
+</html>

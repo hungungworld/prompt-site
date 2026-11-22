@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HR 프롬프트 플레이북</title>
+<meta name="description" content="채용·온보딩·교육·성과·노무까지, HR 업무를 고르고 빈칸만 채우면 AI 프롬프트가 완성돼요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/common.css">
+<style>
+  .hero { padding: 64px 0 40px; }
+  .hero h1 { margin: 0 0 16px; font: 300 clamp(34px, 5.6vw, 60px)/1.3 var(--serif); letter-spacing: -.025em; }
+  .hero h1 em { font-style: normal; font-weight: 700; background: linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 92%, transparent 92%); }
+  .hero p { margin: 0 0 26px; max-width: 36em; color: var(--ink-2); font-size: 18px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; min-height: 50px; padding: 0 22px; border-radius: 12px;
+    font-weight: 600; text-decoration: none; border: 1px solid var(--ink);
+  }
+  .btn.primary { background: var(--ink); color: #fff; }
+  .btn.primary:hover { background: #0E1528; }
+  .btn.secondary { color: var(--ink); background: var(--paper); }
+  .btn.secondary:hover { background: var(--fog); }
+
+  .sec { padding: 40px 0; }
+  .sec h2 { margin: 0 0 4px; font: 700 26px/1.3 var(--serif); letter-spacing: -.02em; }
+  .sec > .wrap > p { margin: 0 0 22px; color: var(--ink-2); }
+
+  /* 사이트 4구역 안내 */
+  .map { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .map a {
+    display: flex; flex-direction: column; gap: 6px; padding: 22px 20px; background: var(--paper);
+    border-radius: 14px; box-shadow: 0 1px 0 var(--line); text-decoration: none; color: var(--ink);
+    border-top: 4px solid var(--line); transition: border-color .15s, transform .15s;
+  }
+  .map a:hover { border-top-color: var(--teal); transform: translateY(-2px); }
+  .map .n { font: 700 14px/1 var(--serif); color: var(--teal); }
+  .map b { font: 700 19px/1.35 var(--serif); }
+  .map .use { font-size: 14.5px; color: var(--ink-2); line-height: 1.6; flex: 1; }
+  .map .when { font-size: 13.5px; color: var(--ink); background: var(--fog); border-radius: 8px; padding: 7px 10px; line-height: 1.5; }
+  .map .go { font-size: 14px; font-weight: 600; color: var(--teal); }
+
+  /* HR 업무 영역 */
+  .areas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .area { background: var(--paper); border-radius: 14px; box-shadow: 0 1px 0 var(--line); padding: 18px 20px; }
+  .area h3 { margin: 0; font: 700 18px/1.35 var(--serif); }
+  .area h3 a { color: var(--ink); text-decoration: none; }
+  .area h3 a:hover { color: var(--teal); }
+  .area p { margin: 2px 0 10px; font-size: 13.5px; color: var(--ink-3); }
+  .area ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .area li a { display: block; font-size: 14.5px; color: var(--ink-2); text-decoration: none; padding: 3px 0; }
+  .area li a::before { content: "→ "; color: var(--line); }
+  .area li a:hover { color: var(--teal); }
+  .area li a:hover::before { color: var(--teal); }
+
+  .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: s; }
+  .flow div { background: var(--paper); border-radius: 14px; padding: 18px 20px; box-shadow: 0 1px 0 var(--line); counter-increment: s; }
+  .flow div::before { content: counter(s); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--marker); font-weight: 700; margin-bottom: 8px; }
+  .flow b { display: block; font-size: 16.5px; }
+  .flow span { font-size: 14.5px; color: var(--ink-2); }
+
+  @media (max-width: 960px) {
+    .map, .areas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .hero { padding: 40px 0 24px; }
+    .hero p { font-size: 16.5px; }
+    .map, .areas, .flow { grid-template-columns: minmax(0, 1fr); }
+    .btn { flex: 1 1 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<header class="gnb">
+  <div class="wrap gnb-in">
+    <a class="brand" href="index.html" aria-current="page"><i>HR</i>프롬프트 플레이북</a>
+    <nav class="gnb-tabs" aria-label="주 메뉴">
+      <a href="prompts.html"><b>업무별 프롬프트</b><small>빈칸만 채워 바로 쓰기</small></a>
+      <a href="generator.html"><b>맞춤 프롬프트 만들기</b><small>목록에 없는 업무는 3칸으로</small></a>
+      <a href="techniques.html"><b>답 고치는 기법</b><small>AI 답이 아쉬울 때</small></a>
+      <a href="tools.html"><b>Claude HR 도구</b><small>슬래시 명령·플러그인</small></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <h1>HR 업무에 바로 쓰는<br><em>AI 프롬프트</em></h1>
+    <p>채용공고부터 평가 코멘트, 노무 질문까지. 하려는 업무를 고르고 빈칸만 채우면 Claude·ChatGPT·Gemini에 붙여 넣을 프롬프트가 완성돼요.</p>
+    <div class="cta">
+      <a class="btn primary" href="prompts.html">업무별 프롬프트 보기</a>
+      <a class="btn secondary" href="generator.html">맞춤 프롬프트 만들기</a>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <h2>무엇을 하러 오셨나요?</h2>
+      <p>이 사이트는 네 구역으로 나뉘어 있어요. 지금 상황에 맞는 곳으로 가세요.</p>
+      <div class="map">
+        <a href="prompts.html">
+          <span class="n">01</span><b>업무별 프롬프트</b>
+          <span class="use">HR 업무 8개 영역, 프롬프트 틀 <span id="taskCount">24</span>개. 칸을 채우면 프롬프트가 완성돼요.</span>
+          <span class="when">하려는 일이 정해져 있을 때</span>
+          <span class="go">바로 가기 →</span>
+        </a>
+        <a href="generator.html">
+          <span class="n">02</span><b>맞춤 프롬프트 만들기</b>
+          <span class="use">작업·원하는 결과물·피할 것 세 칸으로 새 프롬프트를 만들어요.</span>
+          <span class="when">목록에 없는 일을 시키고 싶을 때</span>
+          <span class="go">바로 가기 →</span>
+        </a>
+        <a href="techniques.html">
+          <span class="n">03</span><b>답 고치는 기법</b>
+          <span class="use">페르소나, 단계별 사고 같은 프롬프트 기법 25가지를 문제 상황별로.</span>
+          <span class="when">AI 답이 뻔하거나 틀린 것 같을 때</span>
+          <span class="go">바로 가기 →</span>
+        </a>
+        <a href="tools.html">
+          <span class="n">04</span><b>Claude HR 도구</b>
+          <span class="use">Claude에 설치된 HR 플러그인의 슬래시 명령과 연결할 서비스.</span>
+          <span class="when">Claude에서 명령어로 빠르게 시작하고 싶을 때</span>
+          <span class="go">바로 가기 →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <h2>HR 업무 영역</h2>
+      <p>업무 이름을 누르면 그 프롬프트로 바로 가요.</p>
+      <div class="areas" id="areas"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <h2>쓰는 순서</h2>
+      <p>처음이라면 이렇게 해 보세요.</p>
+      <div class="flow">
+        <div><b>업무 고르기</b><span>업무별 프롬프트에서 하려는 일을 찾아요.</span></div>
+        <div><b>빈칸 채우고 복사</b><span>'예시 값 넣기'로 감을 잡은 뒤 내 상황으로 바꿔요. 실명 대신 A님처럼.</span></div>
+        <div><b>붙여 넣고 확인</b><span>AI 답을 받으면 '결과 확인 포인트' 탭의 항목을 사람이 직접 확인해요.</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">프롬프트 엔지니어링 수업에서 배운 기법을 HR 실무에 맞게 정리했어요. AI의 답은 초안이니, 법·제도·숫자는 공식 자료로 확인하세요.</div></footer>
+
+<script src="assets/shell.js"></script>
+<script src="assets/data-prompts.js"></script>
+<script>
+const { esc } = Shell;
+document.getElementById("taskCount").textContent = AREAS.reduce((n, a) => n + a.tasks.length, 0);
+document.getElementById("areas").innerHTML = AREAS.map(a => `
+  <div class="area">
+    <h3><a href="prompts.html#${a.id}">${esc(a.title)}</a></h3>
+    <p>${esc(a.desc)}</p>
+    <ul>${a.tasks.map(t => `<li><a href="prompts.html#${a.id}-${t.id}">${esc(t.title)}</a></li>`).join("")}</ul>
+  </div>`).join("");
+</script>
+</body>
+</html>

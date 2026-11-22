@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>맞춤 프롬프트 만들기 | HR 프롬프트 플레이북</title>
+<meta name="description" content="HR 작업 정보 세 칸만 입력하면 APE 방식으로 최적 프롬프트를 만들어 주는 생성기">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/common.css">
+<style>
+  .mode-desc { margin: 14px 0 0; color: var(--ink-2); font-size: 15.5px; }
+  .ex-panel { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ex-btn {
+    cursor: pointer; text-align: left; border: 1px solid var(--line); background: var(--paper); border-radius: 10px;
+    padding: 10px 14px; font-size: 15px; line-height: 1.45;
+  }
+  .ex-btn:hover { border-color: var(--ink-2); }
+  .ex-btn small { display: block; color: var(--ink-3); font-size: 13px; }
+  .q { margin-top: 22px; }
+  .q:first-of-type { margin-top: 0; }
+  .q-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .q-head .num { font: 700 20px/1 var(--serif); color: var(--teal); }
+  .q-head label { font-weight: 600; font-size: 18px; }
+  .q-head span { color: var(--ink-2); font-size: 14.5px; }
+  .q textarea, .api input[type=password], .api input[type=text] {
+    width: 100%; font-size: 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: #FAFBFD;
+  }
+  .q textarea { min-height: 84px; resize: vertical; line-height: 1.6; }
+  .q textarea:focus, .api input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+  .api { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line-2); }
+  .api .field-label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 15px; }
+  .api .field-label:first-child { margin-top: 0; }
+  .api .field-label small { color: var(--ink-3); font-weight: 500; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14.5px; margin-top: 10px; cursor: pointer; }
+  .check input { width: 18px; height: 18px; accent-color: var(--teal); }
+  .go {
+    width: 100%; min-height: 60px; margin-top: 4px; border: 0; cursor: pointer; border-radius: 12px;
+    background: var(--teal); color: #fff; font-size: 18px; font-weight: 600;
+  }
+  .go:hover { background: var(--teal-dark); }
+  .go:disabled { opacity: .6; cursor: wait; }
+  .error { color: var(--err); font-weight: 600; margin: 12px 0 0; }
+  .placeholder { border: 2px dashed var(--line); border-radius: 12px; padding: 26px; color: var(--ink-2); }
+  .result pre { max-height: 60vh; overflow: auto; }
+  .why { margin-top: 12px; background: var(--teal-soft); border-radius: 12px; padding: 14px 16px; white-space: pre-wrap; font-size: 15px; }
+  .open-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .open-row a {
+    flex: 1 1 160px; min-height: 52px; display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink);
+    text-decoration: none; font-weight: 600;
+  }
+  .open-row a:hover { border-color: var(--ink); }
+  .paste-steps { margin: 0 0 16px; padding-left: 20px; color: var(--ink-2); }
+  .paste-steps b { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="gnb">
+  <div class="wrap gnb-in">
+    <a class="brand" href="index.html"><i>HR</i>프롬프트 플레이북</a>
+    <nav class="gnb-tabs" aria-label="주 메뉴">
+      <a href="prompts.html"><b>업무별 프롬프트</b><small>빈칸만 채워 바로 쓰기</small></a>
+      <a href="generator.html" aria-current="page"><b>맞춤 프롬프트 만들기</b><small>목록에 없는 업무는 3칸으로</small></a>
+      <a href="techniques.html"><b>답 고치는 기법</b><small>AI 답이 아쉬울 때</small></a>
+      <a href="tools.html"><b>Claude HR 도구</b><small>슬래시 명령·플러그인</small></a>
+    </nav>
+  </div>
+</header>
+<div class="crumbbar">
+  <nav class="wrap crumbs" aria-label="현재 위치">
+    <ol>
+      <li><a href="index.html">홈</a></li>
+      <li><a href="generator.html">맞춤 프롬프트 만들기</a></li>
+      <li data-crumb="cat" hidden></li>
+    </ol>
+  </nav>
+</div>
+
+<div class="wrap layout">
+  <nav class="lnb" aria-label="만드는 순서" data-title="만드는 순서"></nav>
+
+  <main class="content" data-spy-root>
+    <header class="page-head">
+      <p class="eyebrow">맞춤 프롬프트 만들기</p>
+      <h1>작업 정보 세 칸으로<br>HR 프롬프트 만들기</h1>
+      <p><a href="prompts.html">업무별 프롬프트</a>에 없는 일이라면 여기서 만드세요. 후보 프롬프트 여러 개를 만들고 채점해서 가장 좋은 것을 고르는 APE 방식을 써요.</p>
+    </header>
+
+    <!-- 1 -->
+    <section class="cat-sec" id="g-input" data-spy-cat data-title="① 작업 정보 입력">
+      <header class="cat-head"><span class="no">STEP 1</span><h2>작업 정보 입력</h2><p>예시를 눌러 채운 뒤 내 상황에 맞게 고쳐도 돼요.</p></header>
+
+      <div class="card">
+        <h3>예시 불러오기</h3>
+        <div class="tabs" role="tablist" aria-label="HR 업무 영역별 예시" id="exTabs"></div>
+        <div id="exPanels"></div>
+      </div>
+
+      <div class="card">
+        <div class="q">
+          <div class="q-head"><span class="num">01</span><label for="task">작업</label><span>무엇을 시킬까요?</span></div>
+          <textarea id="task" placeholder="예: 경력직 개발자 채용공고 작성"></textarea>
+        </div>
+        <div class="q">
+          <div class="q-head"><span class="num">02</span><label for="goal">원하는 결과물</label><span>어떤 결과를 원하나요?</span></div>
+          <textarea id="goal" placeholder="예: 지원자가 하는 일과 성장 기회를 구체적으로 상상할 수 있는 공고"></textarea>
+        </div>
+        <div class="q">
+          <div class="q-head"><span class="num">03</span><label for="avoid">피해야 할 것</label><span>빼고 싶은 것 (비워도 돼요)</span></div>
+          <textarea id="avoid" placeholder="예: 상투적 표현, 차별적 표현, 사실이 아닌 혜택"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="cat-sec" id="g-mode" data-spy-cat data-title="② 만드는 방식">
+      <header class="cat-head"><span class="no">STEP 2</span><h2>만드는 방식 고르기</h2><p>잘 모르겠으면 '조립기'를 그대로 두세요.</p></header>
+      <div class="card">
+        <div class="tabs seg" role="tablist" aria-label="만드는 방식" id="modeTabs">
+          <button type="button" role="tab" id="tabAsm" aria-controls="panelAsm" aria-selected="true">조립기 (키 없이)</button>
+          <button type="button" role="tab" id="tabApi" aria-controls="panelApi" aria-selected="false" tabindex="-1">AI로 바로 생성</button>
+        </div>
+        <div role="tabpanel" id="panelAsm" aria-labelledby="tabAsm">
+          <p class="mode-desc">API 키 없이 바로 써요. 완성된 APE 틀에 내 내용을 끼워 넣어 주면, 그걸 AI에 붙여 넣어 최종 프롬프트를 받아요.</p>
+        </div>
+        <div role="tabpanel" id="panelApi" aria-labelledby="tabApi" hidden>
+          <p class="mode-desc">내 OpenAI API 키로 이 페이지에서 최종 프롬프트까지 바로 만들어요.</p>
+          <div class="api">
+            <label class="field-label" for="apiKey">내 OpenAI API 키 <small>sk-로 시작해요</small></label>
+            <input id="apiKey" type="password" autocomplete="off" placeholder="sk-...">
+            <label class="check"><input type="checkbox" id="remember"> 이 탭을 닫기 전까지만 키 기억하기</label>
+            <label class="field-label" for="model">모델 <small>(바꾸지 않아도 돼요)</small></label>
+            <input id="model" type="text" value="gpt-4o-mini">
+            <div class="notice"><span>API 키는 비밀번호와 같아요. 키는 이 페이지 코드에 들어 있지 않고, 내 브라우저에서 OpenAI로 바로 보내져요. 다른 사람 컴퓨터에서는 쓰지 마세요.</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="go" id="goBtn" type="button">프롬프트 조립하기</button>
+      <p class="error hidden" id="err" role="alert"></p>
+    </section>
+
+    <!-- 3 -->
+    <section class="cat-sec" id="g-result" data-spy-cat data-title="③ 완성 프롬프트">
+      <header class="cat-head"><span class="no">STEP 3</span><h2 id="resultTitle">완성 프롬프트</h2><p>복사 버튼을 누르면 클립보드에 담겨요.</p></header>
+      <div class="placeholder" id="resultEmpty">아직 만들지 않았어요. STEP 1을 채우고 버튼을 눌러 주세요.</div>
+      <div class="result hidden" id="resultBox">
+        <div class="tpl"><div class="tpl-bar"><span>그대로 복사해서 쓰세요</span><button class="copy js-copy" id="copyBtn" type="button" data-copy="out">프롬프트 복사</button></div><pre id="out"></pre></div>
+        <div class="why hidden" id="why"></div>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="cat-sec" id="g-paste" data-spy-cat data-title="④ AI에 붙여넣기">
+      <header class="cat-head"><span class="no">STEP 4</span><h2>AI에 붙여넣기</h2></header>
+      <div class="card">
+        <ol class="paste-steps">
+          <li>아래 버튼으로 AI를 새 탭에서 열어요.</li>
+          <li>입력창을 누르고 <b>Ctrl + V</b> → <b>Enter</b></li>
+          <li>조립기로 만들었다면, AI가 돌려준 '최적 프롬프트'를 새 채팅에 다시 붙여 넣어 써요.</li>
+        </ol>
+        <div class="open-row">
+          <a href="https://claude.ai/new" target="_blank" rel="noopener">Claude 열기</a>
+          <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini 열기</a>
+          <a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT 열기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer><div class="wrap">APE(Automatic Prompt Engineer) 방식: 후보 여러 개 → 채점 → 장점 결합. 만든 프롬프트에 실제 개인정보를 넣지 말고, 법·제도 내용은 공식 자료로 확인하세요.</div></footer>
+
+<script src="assets/shell.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const { esc } = Shell;
+let mode = "asm";   // "asm" = 조립기, "api" = OpenAI로 생성
+
+/* ===== 업무 영역별 예시 (탭) ===== */
+const EXAMPLES = [
+  { area: "채용", items: [
+    { task: "경력직 개발자 채용공고 작성", goal: "지원자가 하는 일과 성장 기회를 구체적으로 상상할 수 있는 공고", avoid: "상투적 표현(열정, 가족 같은), 차별적 표현, 사실이 아닌 혜택" },
+    { task: "최종 면접 불합격 안내 메일", goal: "정중하고 분명하며 회사에 대한 좋은 인상을 남기는 안내", avoid: "불합격 사유 추측, 과한 사과, 긴 문장" } ] },
+  { area: "온보딩", items: [
+    { task: "신입사원 첫 주 온보딩 일정표", goal: "요일별로 누가 무엇을 하는지 한눈에 보이는 표와 HR 준비 체크리스트", avoid: "하루 6시간 넘는 교육, 담당자 없는 일정" },
+    { task: "입사 전날 보낼 환영 메시지", goal: "긴장을 풀어 주고 첫날 필요한 정보만 담은 짧은 메시지", avoid: "과한 이모지, 확정되지 않은 정보" } ] },
+  { area: "교육", items: [
+    { task: "신임 팀장 리더십 교육과정 설계", goal: "교육 뒤 바로 1on1과 피드백을 할 수 있게 하는 하루 과정", avoid: "강의 위주 구성, 측정할 수 없는 학습 목표" },
+    { task: "교육 만족도 설문 결과 요약", goal: "개선할 점이 우선순위대로 보이는 1페이지 요약", avoid: "응답에 없는 해석, 개인을 알아볼 수 있는 인용" } ] },
+  { area: "성과", items: [
+    { task: "상반기 성과 평가 코멘트 작성", goal: "행동과 사실 중심으로 성장 방향을 제시하는 코멘트", avoid: "성격 평가, 모호한 칭찬, 다른 직원과의 비교" } ] },
+  { area: "소통", items: [
+    { task: "근무제도 변경 사내 공지문", goal: "직원이 이유를 이해하고 혼란 없이 따를 수 있는 공지", avoid: "변명하는 말투, 일방적 통보 느낌, 어려운 법률 용어" } ] },
+  { area: "노무", items: [
+    { task: "직원 연차 관련 질문 답변 정리", goal: "근거 조항과 확인할 점이 분명한 답변 초안", avoid: "지어낸 조항 번호, 단정적인 법 해석" } ] }
+];
+$("exTabs").innerHTML = EXAMPLES.map((g, i) =>
+  `<button type="button" role="tab" id="ex-t${i}" aria-controls="ex-p${i}" aria-selected="${i === 0}" ${i ? 'tabindex="-1"' : ""}>${g.area}</button>`).join("");
+$("exPanels").innerHTML = EXAMPLES.map((g, i) =>
+  `<div class="ex-panel" role="tabpanel" id="ex-p${i}" aria-labelledby="ex-t${i}" ${i ? "hidden" : ""}>${g.items.map((it, j) =>
+    `<button class="ex-btn" type="button" data-g="${i}" data-i="${j}">${esc(it.task)}<small>누르면 세 칸이 채워져요</small></button>`).join("")}</div>`).join("");
+$("exPanels").addEventListener("click", e => {
+  const b = e.target.closest(".ex-btn");
+  if (!b) return;
+  const it = EXAMPLES[b.dataset.g].items[b.dataset.i];
+  $("task").value = it.task; $("goal").value = it.goal; $("avoid").value = it.avoid;
+  $("task").focus({ preventScroll: true });
+});
+
+/* ===== 만드는 방식 탭 ===== */
+$("modeTabs").addEventListener("tabchange", e => {
+  mode = e.detail.tab.id === "tabApi" ? "api" : "asm";
+  $("goBtn").textContent = mode === "asm" ? "프롬프트 조립하기" : "AI로 프롬프트 만들기";
+  $("err").classList.add("hidden");
+});
+
+/* ===== API 키 기억 (탭을 닫으면 사라지는 sessionStorage) ===== */
+try {
+  const saved = sessionStorage.getItem("openai_key");
+  if (saved) { $("apiKey").value = saved; $("remember").checked = true; }
+} catch {}
+
+/* ===== APE 마스터 프롬프트 (HR용) ===== */
+const APE_MASTER = `#역할
+당신은 HR(인사) 실무를 잘 아는 프롬프트 엔지니어링 전문가입니다
+주어진 HR 작업에 대해 최적의 프롬프트를 자동으로 생성, 평가, 개선합니다
+##HR 기본 규칙 (모든 후보 프롬프트에 반영)
+- 실명·주민번호·연봉 등 개인정보는 넣지 않고 [이름], [금액]처럼 빈칸으로 둔다
+- 법·제도·숫자는 지어내지 말고 [확인 필요]로 표시하게 한다
+- 성별·나이·출신·장애 등 차별로 읽힐 수 있는 표현을 피하게 한다
+##APE 실행 순서
+### step 1 : 후보 프롬프트 생성
+아래 작업을 위한 프롬프트 후보 5개를 생성합니다
+각 후보는 서로 다른 전략을 사용해야 합니다
+(역할 부여형 · 단계별 지시형 · 예시 포함형 · 제약 명시형 · 목적 중심형 · 독자 설정형 · 형식 지정형 · 품질 기준형 · 역방향형 · 메타 지시형 중에서 선택)
+### step 2 : 각 후보 자체 평가
+명확성 · 완전성 · 실행 가능성 · 품질 유도력 각 25점, 총 100점으로 채점
+### step 3 : 상위 3개 선택 후 교차 최적화
+상위 3개 프롬프트의 강점을 결합하여 최종 최적 프롬프트 1개 생성
+### step 4 : 최적 프롬프트 출력
+- 최적 프롬프트 전문
+- 왜 이것이 최선인지 설명
+- 사용 시 주의 사항`;
+
+function readInputs() {
+  return { task: $("task").value.trim(), goal: $("goal").value.trim(), avoid: $("avoid").value.trim() || "없음" };
+}
+
+/* ① 조립기: 틀에 입력값만 끼워 넣기 (AI 호출 없음) */
+function assemble({ task, goal, avoid }) {
+  return `${APE_MASTER}
+### 작업 입력
+작업 : {${task}}
+원하는 결과물 : {${goal}}
+피해야 할 것 : {${avoid}}`;
+}
+
+/* ② OpenAI API로 바로 생성 */
+async function generateWithApi({ task, goal, avoid }) {
+  const key = $("apiKey").value.trim();
+  if (!key) throw new Error("API 키를 입력해 주세요.");
+  try {
+    if ($("remember").checked) sessionStorage.setItem("openai_key", key);
+    else sessionStorage.removeItem("openai_key");
+  } catch {}
+
+  const system = APE_MASTER + `
+
+## 출력 규칙
+- 모든 설명은 한국어, 쉬운 말
+- 사실·숫자를 지어내지 말고 모르면 {빈칸}으로 남기기
+- 반드시 아래 JSON 형식으로만 답하기
+{"prompt": "바로 복사해 쓸 수 있는 최종 프롬프트 전문", "why": "왜 이것이 최선인지 3줄", "caution": "사용 시 주의 사항 2줄"}`;
+  const user = `작업 : ${task}\n원하는 결과물 : ${goal}\n피해야 할 것 : ${avoid}`;
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
+    body: JSON.stringify({
+      model: $("model").value.trim() || "gpt-4o-mini",
+      messages: [{ role: "system", content: system }, { role: "user", content: user }],
+      response_format: { type: "json_object" }
+    })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = data.error?.message || res.statusText;
+    if (res.status === 401) throw new Error("API 키가 올바르지 않아요. 키를 다시 확인해 주세요. (" + msg + ")");
+    if (res.status === 429) throw new Error("사용 한도를 넘었거나 크레딧이 부족해요. OpenAI 결제/한도 설정을 확인해 주세요. (" + msg + ")");
+    if (res.status === 404) throw new Error("모델 이름을 찾을 수 없어요. 모델 칸을 확인해 주세요. (" + msg + ")");
+    throw new Error("오류가 났어요: " + msg);
+  }
+  const text = data.choices?.[0]?.message?.content || "";
+  try { return JSON.parse(text); } catch { return { prompt: text, why: "", caution: "" }; }
+}
+
+/* ===== 만들기 버튼 ===== */
+$("goBtn").onclick = async () => {
+  const input = readInputs();
+  const err = $("err");
+  err.classList.add("hidden");
+  if (!input.task || !input.goal) {
+    err.textContent = "01 작업과 02 원하는 결과물은 꼭 적어 주세요. 예시 버튼을 눌러도 돼요.";
+    err.classList.remove("hidden");
+    return;
+  }
+  if (mode === "asm") { showResult("완성 프롬프트 (APE 조립본)", assemble(input), ""); return; }
+
+  const btn = $("goBtn");
+  btn.disabled = true; btn.textContent = "만드는 중… (10~30초)";
+  try {
+    const r = await generateWithApi(input);
+    const why = [r.why && "왜 최선인가\n" + r.why, r.caution && "주의할 점\n" + r.caution].filter(Boolean).join("\n\n");
+    showResult("최적 프롬프트", r.prompt || "(결과가 비어 있어요. 다시 시도해 주세요.)", why);
+  } catch (e) {
+    err.textContent = e.message.startsWith("Failed to fetch") ? "인터넷 연결 또는 브라우저 차단으로 OpenAI에 연결하지 못했어요." : e.message;
+    err.classList.remove("hidden");
+  } finally {
+    btn.disabled = false; btn.textContent = "AI로 프롬프트 만들기";
+  }
+};
+
+function showResult(title, text, why) {
+  $("resultTitle").textContent = title;
+  $("out").textContent = text;
+  $("why").textContent = why;
+  $("why").classList.toggle("hidden", !why);
+  $("resultEmpty").classList.add("hidden");
+  $("resultBox").classList.remove("hidden");
+  $("g-result").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+Shell.initSpy();
+</script>
+</body>
+</html>
